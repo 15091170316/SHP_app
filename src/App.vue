@@ -1,15 +1,19 @@
 <template>
   <div>
-    <h1>我是APP</h1>
+    <HeaderVue></HeaderVue>
+    <FooterVue></FooterVue>
   </div>
 </template>
 
 <script>
+import HeaderVue from '@/components/Header/HeaderVue.vue'
+import FooterVue from '@/components/Footer/FooterVue.vue'
 
 export default {
   name: 'App',
   components: {
-
+    HeaderVue,
+    FooterVue
   }
 }
 </script>
