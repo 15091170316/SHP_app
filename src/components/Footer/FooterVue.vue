@@ -97,7 +97,7 @@
 </template>
 <script>
 export default {
-
+    name: 'FooterVue'
 }
 </script>
 <style scoped lang="less">

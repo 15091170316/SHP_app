@@ -1,7 +1,8 @@
 <template>
   <div>
     <HeaderVue></HeaderVue>
-    <FooterVue></FooterVue>
+    <router-view></router-view>
+    <FooterVue v-show="$route.meta.showFooter"></FooterVue>
   </div>
 </template>
 
