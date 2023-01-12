@@ -34,12 +34,12 @@ export default new VueRouter({
         {
             path: '/home',
             component: () => import('@/pages/Home/HomeVue.vue'),
-            meta: {showFooter: true}
+            meta: {showFooter: true, showTypeNav: true}
         },
         {
             path: '/search',
             component: () => import('@/pages/Search/SearchVue'),
-            meta: {showFooter: true}
+            meta: {showFooter: true, showTypeNav: false}
         },
         {
             path: '/login',

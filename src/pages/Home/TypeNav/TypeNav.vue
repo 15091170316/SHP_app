@@ -1,7 +1,7 @@
 <template>
     <div class="type-nav">
-        <div class="container">
-            <h2 class="all">全部商品分类</h2>
+        <div class="container" @mouseleave="leaveTypeNavHandler">
+            <h2 class="all" @mouseenter="showTypeNav = true">全部商品分类</h2>
             <nav class="nav">
                 <a href="###">服装城</a>
                 <a href="###">美妆馆</a>
@@ -12,62 +12,82 @@
                 <a href="###">有趣</a>
                 <a href="###">秒杀</a>
             </nav>
-            <div class="sort" @mouseleave="currentIndex = -1">
-                <div class="all-sort-list2" @click="clickAHandler">
-                    <!-- 一级菜单 -->
-                    <div class="item" v-for="c1,index of typeNavData" :key="c1.categoryId" @mouseenter="currentIndex = index" :class="{current: currentIndex === index}">
-                        <h3>
-                            <a :data-categoryName="c1.categoryName" :data-categroy1ID="c1.categoryId">{{ c1.categoryName }}</a>
-                        </h3>
-                        <div class="item-list clearfix" v-show="currentIndex === index">
-                            <div class="subitem">
-                                <!-- 二级菜单 -->
-                                <dl class="fore" v-for="c2 of c1.categoryChild" :key="c2.categoryId">
-                                    <dt>
-                                        <a :data-categoryName="c2.categoryName" :data-categroy2ID="c2.categoryId">{{ c2.categoryName }}</a>
-                                    </dt>
-                                    <dd>
-                                        <!-- 三级菜单 -->
-                                        <em v-for="c3 of c2.categoryChild" :key="c3.categoryId">
-                                            <a :data-categoryName="c3.categoryName" :data-categroy3ID="c3.categoryId">{{ c3.categoryName }}</a>
-                                        </em>
-                                    </dd>
-                                </dl>
+            <!-- 添加菜单过渡效果 -->
+            <transition name="sort">
+                <div class="sort" v-show="showTypeNav">
+                    <div class="all-sort-list2" @click="clickAHandler">
+                        <!-- 一级菜单 -->
+                        <div class="item" v-for="c1, index of typeNavData" :key="c1.categoryId"
+                            @mouseenter="currentIndex = index" :class="{ current: currentIndex === index }">
+                            <h3>
+                                <a :data-categoryName="c1.categoryName" :data-categroy1ID="c1.categoryId">{{
+                                    c1.categoryName
+                                }}</a>
+                            </h3>
+                            <div class="item-list clearfix" v-show="currentIndex === index">
+                                <div class="subitem">
+                                    <!-- 二级菜单 -->
+                                    <dl class="fore" v-for="c2 of c1.categoryChild" :key="c2.categoryId">
+                                        <dt>
+                                            <a :data-categoryName="c2.categoryName" :data-categroy2ID="c2.categoryId">{{
+                                                c2.categoryName
+                                            }}</a>
+                                        </dt>
+                                        <dd>
+                                            <!-- 三级菜单 -->
+                                            <em v-for="c3 of c2.categoryChild" :key="c3.categoryId">
+                                                <a :data-categoryName="c3.categoryName"
+                                                    :data-categroy3ID="c3.categoryId">{{
+    c3.categoryName
+                                                    }}</a>
+                                            </em>
+                                        </dd>
+                                    </dl>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </transition>
         </div>
     </div>
 </template>
 <script>
 // 引入vuex辅助map
-import {mapState,mapActions} from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
     name: 'TypeNav',
-    data(){
+    data() {
         return {
             currentIndex: -1,    // 一级菜单鼠标悬浮的index
+            showTypeNav: this.$route.meta.showTypeNav   //一级菜单是否展示
         }
     },
     computed: {
-        ...mapState('home', ['typeNavData'])
+        ...mapState('home', ['typeNavData']),
     },
     methods: {
-        ...mapActions('home', ['getTypeNav']),   //解构出vuex中的actions方法
+        // 鼠标离开菜单时的操作
+        leaveTypeNavHandler() {
+            this.currentIndex = -1     //隐藏二三级菜单
+            // 隐藏一级菜单（非/home路由组件）
+            if (this.$route.path !== '/home') {
+                this.showTypeNav = false
+            }
+        },
         // 三级联动路由跳转的事件委派(将事件委派到它们的父级元素上，在通过data-自定义属性识别a标签)
-        clickAHandler(event){
-            let {categoryname, categroy1id, categroy2id, categroy3id} = event.target.dataset    //将点击的标签身上的自定义属性解构出来（没有就是undefined）
-            if(categoryname){   //有categoryName就是a标签
-                let location = {path: '/search'}    //路由跳转路径
-                let query = {categoryName: categoryname}    //路由跳转携带的query参数
-                if(categroy1id){
+        clickAHandler(event) {
+            //将点击的标签身上的自定义属性解构出来（没有的就是undefined）
+            let { categoryname, categroy1id, categroy2id, categroy3id } = event.target.dataset
+            if (categoryname) {   //有categoryName就是a标签
+                let location = { path: '/search' }    //路由跳转路径
+                let query = { categoryName: categoryname }    //路由跳转携带的query参数
+                if (categroy1id) {    // 这些自定义属性用来区分是第几级的菜单，并传递id参数
                     query.category1ID = categroy1id
-                }else if(categroy2id){
+                } else if (categroy2id) {
                     query.category2ID = categroy2id
-                }else if(categroy3id){
+                } else if (categroy3id) {
                     query.category3ID = categroy3id
                 }
                 // 合并完整的参数
@@ -76,9 +96,6 @@ export default {
                 this.$router.push(location)
             }
         }
-    },
-    mounted(){
-        this.getTypeNav()   //调用vuex中的获取三级联动菜单的actions方法
     }
 }
 </script>
@@ -124,9 +141,10 @@ export default {
             z-index: 999;
 
             .all-sort-list2 {
-                .current{
+                .current {
                     background-color: skyblue;
                 }
+
                 .item {
                     h3 {
                         line-height: 30px;
@@ -204,6 +222,23 @@ export default {
                     // }
                 }
             }
+        }
+
+        // 导航菜单过渡效果
+        .sort-enter-active,
+        .sort-leave-active {
+            overflow: hidden;
+            transition: all .1s linear;
+        }
+
+        .sort-enter,
+        .sort-leave-to {
+            height: 0;
+        }
+
+        .sort-enter-to,
+        .sort-leave {
+            height: 461px;
         }
     }
 }
