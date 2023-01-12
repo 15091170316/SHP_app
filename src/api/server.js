@@ -1,8 +1,11 @@
 // 对于axios进行二次封装
 import axios from 'axios'
+// 引入nprogress进度条和样式
+import nprogress from 'nprogress'
+import "nprogress/nprogress.css"
 
 // 1、利用axios对象的create方法，去创建一个axios实例
-// 2、server就是案凶手，只不过稍微配置一下
+// 2、server就是axios，只不过稍微配置一下
 const server = axios.create({
     // 基础路径，发送请求的时候，路径中就会自动加上/api
     baseURL: '/api',
@@ -11,14 +14,20 @@ const server = axios.create({
 })
 // 请求拦截器：在发送请求之前，请求拦截器可以监测到，可以在请求发送之前处理一些事情
 server.interceptors.request.use(config => {
+    // 开启进度条
+    nprogress.start()
     // config：配置对象，对象里面的headers请求头属性很重要
     return config
 })
 // 响应拦截器
 server.interceptors.response.use(res => {
+    // 进度条结束
+    nprogress.done()
     // 成功的回调函数：服务器响应数据后，响应拦截器可以检测到，可以处理一些业务
     return res.data;
 }, error => {
+    // 进度条结束
+    nprogress.done()
     // 响应失败的回调函数
     return Promise.reject(new Error(error.message))
 })

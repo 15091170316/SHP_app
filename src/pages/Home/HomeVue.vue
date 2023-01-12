@@ -35,7 +35,7 @@ export default {
         GuessLike,
         FloorGoods,
         BrandGoods
-    }
+    },
 
 }
 </script>

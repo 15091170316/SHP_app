@@ -4,6 +4,8 @@ import App from './App.vue'
 import VueRouter from 'vue-router'
 // 引入router配置文件
 import router from '@/router'
+// 引入vuex配置文件
+import store from '@/store/index'
 // 使用路由插件
 Vue.use(VueRouter)
 
@@ -15,5 +17,6 @@ Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
-  router
+  router,
+  store
 }).$mount('#app')
