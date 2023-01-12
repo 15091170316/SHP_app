@@ -7,6 +7,10 @@ import router from '@/router'
 // 使用路由插件
 Vue.use(VueRouter)
 
+// 注册全局组件
+// 商品分类导航三级联动
+Vue.component('TypeNav', ()=>import('@/pages/Home/TypeNav/TypeNav.vue'))
+
 Vue.config.productionTip = false
 
 new Vue({
