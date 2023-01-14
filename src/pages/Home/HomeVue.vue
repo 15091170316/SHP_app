@@ -11,13 +11,13 @@
         <!-- 猜你喜欢 -->
         <GuessLike></GuessLike>
         <!-- 商品楼层 -->
-        <FloorGoods></FloorGoods>
-        <FloorGoods></FloorGoods>
+        <FloorGoods v-for="list of floorList" :key="list.id" :list = list></FloorGoods>
         <!-- 商品商标 -->
         <BrandGoods></BrandGoods>
     </div>
 </template>
 <script>
+import {mapState, mapActions} from 'vuex'
 // 注册组件
 import ListContainer from '@/pages/Home/ListContainer/ListContainer.vue'
 import TodayRecommend from '@/pages/Home/TodayRecommend/TodayRecommend.vue'
@@ -36,6 +36,15 @@ export default {
         FloorGoods,
         BrandGoods
     },
+    computed: {
+        ...mapState('home', ['floorList'])
+    },
+    methods:{
+        ...mapActions('home', ['getFloorList'])
+    },
+    mounted(){
+        this.getFloorList()
+    }
 
 }
 </script>

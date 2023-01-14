@@ -42,19 +42,28 @@
 <script>
 export default {
     name: 'HeaderVue',
-    data(){
+    data() {
         return {
             keyword: ''
         }
     },
     methods: {
-        goSearch(){
-            this.$router.push({
-                path: '/search',
-                query: {
-                    keyword: this.keyword || undefined
+        // 搜索按钮点击事件
+        goSearch() {
+            // 定义路由跳转路径和参数
+            let location = { path: '/search', query: { keyword: this.keyword || undefined } }
+            // 判断是否已有三级菜单的路由参数
+            //      若有，则需要同时携带上三级菜单的参数一起跳转；若无，则直接跳转
+            if (this.$route.query.categoryName) {     // 有三级菜单的路由参数
+                for (const key in this.$route.query) {
+                    if(key !== 'keyword'){  //防止把上次搜索的keyword参数添加进来
+                        location.query[key] = this.$route.query[key]
+                    }
                 }
-            })
+            }
+            console.log(location.query);
+            // 路由跳转
+            this.$router.push(location)
         }
     }
 }

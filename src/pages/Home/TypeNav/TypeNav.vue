@@ -90,6 +90,12 @@ export default {
                 } else if (categroy3id) {
                     query.category3ID = categroy3id
                 }
+                
+                // 判断搜索栏是否已有了路由跳转参数。
+                //     若有，则要同时携带上搜索栏中的参数；若无，则直接跳转
+                if(this.$route.query.keyword){  //搜索栏已有搜索参数
+                    query.keyword = this.$route.query.keyword
+                }
                 // 合并完整的参数
                 location.query = query
                 // 路由跳转

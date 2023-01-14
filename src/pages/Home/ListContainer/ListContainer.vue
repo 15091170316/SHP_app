@@ -3,20 +3,11 @@
         <div class="sortList clearfix">
             <div class="center">
                 <!--banner轮播-->
-                <div class="swiper-container" id="mySwiper">
+                <div class="swiper-container" ref="sortCarouse">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <img src="./images/banner1.jpg" />
+                        <div class="swiper-slide" v-for="items of bannerList" :key="items.id">
+                            <img :src="items.imgUrl" />
                         </div>
-                        <!-- <div class="swiper-slide">
-                            <img src="./images/banner2.jpg" />
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="./images/banner3.jpg" />
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="./images/banner4.jpg" />
-                        </div> -->
                     </div>
                     <!-- 如果需要分页器 -->
                     <div class="swiper-pagination"></div>
@@ -110,8 +101,50 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+import Swiper from 'swiper';
+
 export default {
-    name: 'ListContainer'
+    name: 'ListContainer',
+    computed: {
+        ...mapState('home', ['bannerList'])
+    },
+    methods: {
+        ...mapActions('home', ['getBannerList'])
+    },
+    watch: {
+        // swiper库必须要DOM元素全部挂载完毕后才能new实例，在异步数据里需要配合watch + $nextTick来解决异步延迟加载问题
+        // 监视bannerList轮播图列表数据，当数据发生改变时，即异步请求完成后
+        bannerList() {
+            // $nextTick主要是确保数据回来后，v-for指令执行结束后，即所有DOM元素挂载完毕后，才能开始创建Swiper实例
+            this.$nextTick(() => {
+                new Swiper(this.$refs.sortCarouse, {
+                    loop: true, // 循环模式选项
+                    speed: 500,
+                    autoplay: {
+                        delay: 3000,
+                        disableOnInteraction: false
+                    },
+
+                    // 如果需要分页器
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true
+                    },
+
+                    // 如果需要前进后退按钮
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    }
+                })
+            })
+        }
+    },
+    mounted() {
+        // 请求轮播图数据
+        this.getBannerList()
+    }
 }
 </script>
 

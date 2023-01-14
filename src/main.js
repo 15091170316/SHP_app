@@ -6,6 +6,10 @@ import VueRouter from 'vue-router'
 import router from '@/router'
 // 引入vuex配置文件
 import store from '@/store/index'
+// 引入mock模拟数据（使其执行一遍就行，不需要暴露）
+import '@/mock/mockServer'
+// 全局引入swiper轮播图库的CSS文件
+import 'swiper/css/swiper.min.css'
 // 使用路由插件
 Vue.use(VueRouter)
 
