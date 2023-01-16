@@ -61,10 +61,15 @@ export default {
                     }
                 }
             }
-            console.log(location.query);
             // 路由跳转
             this.$router.push(location)
         }
+    },
+    mounted(){
+        // 全局事件总线，将input搜索框置空
+        this.$bus.$on('emptySearch', ()=>{
+            this.keyword = ''
+        })
     }
 }
 </script>

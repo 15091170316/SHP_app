@@ -15,12 +15,16 @@ Vue.use(VueRouter)
 
 // 注册全局组件
 // 商品分类导航三级联动
-Vue.component('TypeNav', ()=>import('@/pages/Home/TypeNav/TypeNav.vue'))
+Vue.component('TypeNav', () => import('@/pages/Home/TypeNav/TypeNav.vue'))
 
 Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
+  beforeCreate() {
+    // 安装全局事件总线，$bus就是当前应用的vm 
+    Vue.prototype.$bus = this    
+  },
   router,
   store
 }).$mount('#app')

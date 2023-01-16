@@ -9,10 +9,18 @@ const reqCategoryList = () => server({method:'get', url:'/product/getBaseCategor
 const reqBannerList = () => mockServer({method:'get', url:'/banner'})
 // 首页列表接口（mock）
 const reqFloorList = () => mockServer({method: 'get', url: '/floor'})
+// 搜索页数据接口
+const reqSourchData = (params) => server({
+    method: 'post',
+    url: '/list',
+    data: params
+})
+
 
 // 统一向外暴露请求
 export {
     reqCategoryList,
     reqBannerList,
-    reqFloorList
+    reqFloorList,
+    reqSourchData
 }

@@ -84,11 +84,11 @@ export default {
                 let location = { path: '/search' }    //路由跳转路径
                 let query = { categoryName: categoryname }    //路由跳转携带的query参数
                 if (categroy1id) {    // 这些自定义属性用来区分是第几级的菜单，并传递id参数
-                    query.category1ID = categroy1id
+                    query.category1Id = categroy1id
                 } else if (categroy2id) {
-                    query.category2ID = categroy2id
+                    query.category2Id = categroy2id
                 } else if (categroy3id) {
-                    query.category3ID = categroy3id
+                    query.category3Id = categroy3id
                 }
                 
                 // 判断搜索栏是否已有了路由跳转参数。
