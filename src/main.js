@@ -16,6 +16,8 @@ Vue.use(VueRouter)
 // 注册全局组件
 // 商品分类导航三级联动
 Vue.component('TypeNav', () => import('@/pages/Home/TypeNav/TypeNav.vue'))
+// 分页器
+Vue.component('PaginationVue', () => import('@/components/Pagination/PaginationVue.vue'))
 
 Vue.config.productionTip = false
 

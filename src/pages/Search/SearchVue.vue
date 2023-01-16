@@ -75,35 +75,7 @@
                     </div>
 
                     <!-- 分页系统 -->
-                    <div class="fr page">
-                        <div class="sui-pagination clearfix">
-                            <ul>
-                                <li class="prev disabled">
-                                    <a href="#">«上一页</a>
-                                </li>
-                                <li class="active">
-                                    <a href="#">1</a>
-                                </li>
-                                <li>
-                                    <a href="#">2</a>
-                                </li>
-                                <li>
-                                    <a href="#">3</a>
-                                </li>
-                                <li>
-                                    <a href="#">4</a>
-                                </li>
-                                <li>
-                                    <a href="#">5</a>
-                                </li>
-                                <li class="dotted"><span>...</span></li>
-                                <li class="next">
-                                    <a href="#">下一页»</a>
-                                </li>
-                            </ul>
-                            <div><span>共10页&nbsp;</span></div>
-                        </div>
-                    </div>
+                    <PaginationVue v-if="searchData.total!==0" @curPageNo="curPageNo" :pageNo="searchParams.pageNo" :pageSize="searchParams.pageSize" :total="searchData.total" :continues="5"></PaginationVue>
                 </div>
             </div>
         </div>
@@ -113,7 +85,7 @@
 <script>
 import TypeNav from '@/pages/Home/TypeNav/TypeNav.vue'
 import SearchSelector from './SearchSelector/SearchSelector'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 export default {
     name: 'SearchVue',
     components: {
@@ -138,6 +110,7 @@ export default {
     },
     computed: {
         ...mapGetters('search', ['goodsList']),
+        ...mapState('search', ['searchData']),
         // 是否综合排序
         isCom(){
             return this.searchParams.order.includes('1')
@@ -146,6 +119,7 @@ export default {
         arrowDirection(){
             return this.searchParams.order.includes('desc') ? `↓` : `↑`
         },
+        
     },
     methods: {
         ...mapActions('search', ['getSearchData']),
@@ -157,6 +131,8 @@ export default {
             this.searchParams.category1Id = undefined
             this.searchParams.category2Id = undefined
             this.searchParams.category3Id = undefined
+            // 将页码归1
+            this.searchParams.pageNo = 1
             // 删除路由url中该分类的参数（但搜索数据不能删除）
             let query = { keyword: this.$route.query.keyword || undefined }
             this.$router.push({ path: '/search', query: query })  //重新再跳转一次路由，修改路由地址栏，watch监视属性就可以发送Ajax请求
@@ -167,6 +143,8 @@ export default {
             this.searchParams.keyword = undefined
             // 通知HeaderVue组件将搜索框中的数据置空
             this.$bus.$emit('emptySearch')
+            // 将页码归1
+            this.searchParams.pageNo = 1
             // 删除路由url中keyword的参数（但三级分类数据不能删除）
             let query = Object.assign({}, this.$route.query)    //复制一份query参数(这是为了深拷贝，因为浅拷贝的参数不会引起路由跳转)
             delete query.keyword     //删除keyword路由
@@ -176,6 +154,8 @@ export default {
         getBrand(brandObj) {
             // 拼接成请求参数的格式,存入参数数据中
             this.searchParams.trademark = brandObj.tmId + ':' + brandObj.tmName
+            // 将页码归1
+            this.searchParams.pageNo = 1
             // 携带trademark参数后再次请求数据
             this.getSearchData(this.searchParams)
         },
@@ -183,11 +163,15 @@ export default {
         removeTrademark() {
             // 删除searchParams中的trademark
             this.searchParams.trademark = undefined
+            // 将页码归1
+            this.searchParams.pageNo = 1
             // 删除参数后重新发送请求
             this.getSearchData(this.searchParams)
         },
         // 组件自定义事件（SearchSelector给SearchVue传递商品属性参数）
         getProps(propObj) {
+            // 将页码归1
+            this.searchParams.pageNo = 1
             let prop = `${propObj.id}:${propObj.value}:${propObj.name}` //拼接请求参数
             // 判断是否已经有该属性的参数了,有了就直接return
             if(this.searchParams.props.indexOf(prop) !== -1){
@@ -198,6 +182,8 @@ export default {
         },
         // 删除面包屑（商品属性面包屑）
         removeProps(propId) {
+            // 将页码归1
+            this.searchParams.pageNo = 1
             // 删除searchParams中对应id的prop（使用Set集合删除数组中的指定元素）
             let set_arr = new Set(this.searchParams.props)
             this.searchParams.props.forEach(prop => {
@@ -211,6 +197,8 @@ export default {
         },
         // 排序按钮点击事件
         orderHandler(id){
+            // 将页码归1
+            this.searchParams.pageNo = 1
             if(this.searchParams.order.includes('desc')){
                 this.searchParams.order = `${id}:asc`
             }else{
@@ -219,6 +207,12 @@ export default {
             // 再次请求数据
             this.getSearchData(this.searchParams)
         },
+        // 自定义事件：获取分页组件中选择的页码
+        curPageNo(curPage){
+            this.searchParams.pageNo = curPage
+            // 再次请求数据
+            this.getSearchData(this.searchParams)
+        }
     },
     beforeMount() {
         // 挂载前：整理路由参数中的数据，传给Ajax请求
