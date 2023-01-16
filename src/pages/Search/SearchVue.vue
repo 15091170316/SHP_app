@@ -34,23 +34,11 @@
                     <div class="sui-navbar">
                         <div class="navbar-inner filter">
                             <ul class="sui-nav">
-                                <li class="active">
-                                    <a href="#">综合</a>
+                                <li :class="{active:isCom}">
+                                    <a @click="orderHandler(1)">综合 <span v-show="isCom">{{ arrowDirection }}</span></a>
                                 </li>
-                                <li>
-                                    <a href="#">销量</a>
-                                </li>
-                                <li>
-                                    <a href="#">新品</a>
-                                </li>
-                                <li>
-                                    <a href="#">评价</a>
-                                </li>
-                                <li>
-                                    <a href="#">价格⬆</a>
-                                </li>
-                                <li>
-                                    <a href="#">价格⬇</a>
+                                <li :class="{active:!isCom}">
+                                    <a @click="orderHandler(2)">价格 <span v-show="!isCom">{{ arrowDirection }}</span></a>
                                 </li>
                             </ul>
                         </div>
@@ -140,7 +128,7 @@ export default {
                 category3Id: "",    //第三级菜单id
                 categoryName: "",   //三级菜单名字
                 keyword: "",        //搜索关键字
-                order: "",          //排序方式
+                order: "1:desc",    //排序方式
                 pageNo: 1,          //当前页码
                 pageSize: 10,       //每页展示的数量
                 props: [],          //商品属性
@@ -149,7 +137,15 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('search', ['goodsList'])
+        ...mapGetters('search', ['goodsList']),
+        // 是否综合排序
+        isCom(){
+            return this.searchParams.order.includes('1')
+        },
+        // 排序箭头（上下）
+        arrowDirection(){
+            return this.searchParams.order.includes('desc') ? `↓` : `↑`
+        },
     },
     methods: {
         ...mapActions('search', ['getSearchData']),
@@ -212,7 +208,17 @@ export default {
             this.searchParams.props = [...set_arr]  //转成正常的数组，否则数据请求会出错
             // 删除参数后重新发送请求
             this.getSearchData(this.searchParams)
-        }
+        },
+        // 排序按钮点击事件
+        orderHandler(id){
+            if(this.searchParams.order.includes('desc')){
+                this.searchParams.order = `${id}:asc`
+            }else{
+                this.searchParams.order = `${id}:desc`
+            }
+            // 再次请求数据
+            this.getSearchData(this.searchParams)
+        },
     },
     beforeMount() {
         // 挂载前：整理路由参数中的数据，传给Ajax请求
