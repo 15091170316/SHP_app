@@ -16,6 +16,10 @@ const server = axios.create({
 server.interceptors.request.use(config => {
     // 开启进度条
     nprogress.start()
+    // 如果有游客token就添加在请求头上添加游客的token(后端开发人员需要处理这个请求头)
+    if(localStorage.getItem('nanoid_token')){
+        config.headers.userTempId = localStorage.getItem('nanoid_token')
+    }
     // config：配置对象，对象里面的headers请求头属性很重要
     return config
 })

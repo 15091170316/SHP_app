@@ -42,6 +42,12 @@ export default new VueRouter({
             meta: {showFooter: true, showTypeNav: false}
         },
         {
+            name: 'detail',
+            path: '/detail/:goodId',
+            component: () => import('@/pages/Detail/DetailVue.vue'),
+            meta: {showFooter: true}
+        },
+        {
             path: '/login',
             component: () => import('@/pages/Login/LoginVue'),
             meta: {showFooter: false}
@@ -51,5 +57,18 @@ export default new VueRouter({
             component: () => import('@/pages/Register/RegisterVue'),
             meta: {showFooter: false}
         },
-    ]
+        {
+            path: '/addcart',
+            component: () => import('@/pages/AddCart/AddCartSuccess.vue'),
+            meta: {showFooter: true}
+        },
+        {
+            path: '/shopcart',
+            component: () => import('@/pages/ShopCart/ShopCart.vue'),
+            meta: {showFooter: true}
+        },
+    ],
+    scrollBehavior () {
+        return { x: 0, y: 0 }
+      }
 })

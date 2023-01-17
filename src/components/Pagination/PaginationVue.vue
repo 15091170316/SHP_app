@@ -36,10 +36,10 @@ export default {
         startAndEndPage() {
             let start = this.pageNo - parseInt(this.continues / 2)
             let end = this.pageNo + parseInt(this.continues / 2)
-            if (this.totalPage < this.continues) {
+            if (this.totalPage < this.continues) {  //总页数 < 连续页码时
                 start = 1
                 end = this.totalPage
-            } else {
+            } else {    //总页数 > 连续页码时
                 if (start < 1) {
                     start = 1
                     end = this.continues

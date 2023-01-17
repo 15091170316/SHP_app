@@ -15,6 +15,12 @@ const reqSourchData = (params) => server({
     url: '/list',
     data: params
 })
+// 获取商品详细信息
+const reqGoodInfo = (goodId) => server({method: 'get', url: `/item/${goodId}`})
+// 将商品信息存储到购物车接口
+const reqAddUpdateShoppingCar = (skuId, skuNum) => server({method:'post', url: `/cart/addToCart/${skuId}/${skuNum}`})
+// 获取购物车中的商品接口
+const reqShopCartList = () => server({method: 'get', url: '/cart/cartList'})
 
 
 // 统一向外暴露请求
@@ -22,5 +28,8 @@ export {
     reqCategoryList,
     reqBannerList,
     reqFloorList,
-    reqSourchData
+    reqSourchData,
+    reqGoodInfo,
+    reqAddUpdateShoppingCar,
+    reqShopCartList
 }
