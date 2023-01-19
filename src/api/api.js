@@ -21,6 +21,11 @@ const reqGoodInfo = (goodId) => server({method: 'get', url: `/item/${goodId}`})
 const reqAddUpdateShoppingCar = (skuId, skuNum) => server({method:'post', url: `/cart/addToCart/${skuId}/${skuNum}`})
 // 获取购物车中的商品接口
 const reqShopCartList = () => server({method: 'get', url: '/cart/cartList'})
+// 删除购物车商品接口
+const reqDeleteShoppingGood = (skuId) => server({method:'delete', url: `/cart/deleteCart/${skuId}`})
+// 切换商品选中状态接口
+const reqChangeChecked = (skuID, isChecked) => server({method:'get', url:`/cart/checkCart/${skuID}/${isChecked}`})
+
 
 
 // 统一向外暴露请求
@@ -31,5 +36,7 @@ export {
     reqSourchData,
     reqGoodInfo,
     reqAddUpdateShoppingCar,
-    reqShopCartList
+    reqShopCartList,
+    reqDeleteShoppingGood,
+    reqChangeChecked
 }

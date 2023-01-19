@@ -13,25 +13,27 @@
       <div class="cart-body">
         <ul class="cart-list" v-for="cartInfo of cartInfoList" :key="cartInfo.id">
           <li class="cart-list-con1">
-            <input type="checkbox" name="chk_list" :checked="cartInfo.isChecked">
+            <input type="checkbox" name="chk_list" :checked="cartInfo.isChecked"
+              @click="checkboxHandler($event, cartInfo)">
           </li>
           <li class="cart-list-con2">
             <img :src="cartInfo.imgUrl">
             <div class="item-msg">{{ cartInfo.skuName }}</div>
           </li>
           <li class="cart-list-con4">
-            <span class="price">{{cartInfo.skuPrice}}</span>
+            <span class="price">{{ cartInfo.skuPrice }}</span>
           </li>
           <li class="cart-list-con5">
-            <a href="javascript:void(0)" class="mins">-</a>
-            <input autocomplete="off" type="text" minnum="1" class="itxt" :value="cartInfo.skuNum">
-            <a href="javascript:void(0)" class="plus">+</a>
+            <a href="javascript:void(0)" class="mins" @click="numHandler(cartInfo, -1)">-</a>
+            <input autocomplete="off" type="text" minnum="1" class="itxt" :value="cartInfo.skuNum"
+              @change="inputHandler($event, cartInfo), numHandler(cartInfo, $event.target.value - cartInfo.skuNum)">
+            <a href="javascript:void(0)" class="plus" @click="numHandler(cartInfo, 1)">+</a>
           </li>
           <li class="cart-list-con6">
             <span class="sum">{{ cartInfo.skuPrice * cartInfo.skuNum }}</span>
           </li>
           <li class="cart-list-con7">
-            <a href="#none" class="sindelet">删除</a>
+            <a class="sindelet" href="javascript:;" @click="deleteGoodHandler(cartInfo)">删除</a>
             <br>
             <a href="#none">移到收藏</a>
           </li>
@@ -40,11 +42,11 @@
     </div>
     <div class="cart-tool">
       <div class="select-all">
-        <input class="chooseAll" type="checkbox" :checked="allCheck">
+        <input class="chooseAll" type="checkbox" :checked="allCheck" @click="allCheckboxHandler">
         <span>全选</span>
       </div>
       <div class="option">
-        <a href="#none">删除选中的商品</a>
+        <a href="javascript:;" @click="deleteCheckedHandler">删除选中的商品</a>
         <a href="#none">移到我的关注</a>
         <a href="#none">清除下柜商品</a>
       </div>
@@ -54,7 +56,7 @@
         </div>
         <div class="sumprice">
           <em>总价（不含运费） ：</em>
-          <i class="summoney">{{total}}</i>
+          <i class="summoney">{{ total }}</i>
         </div>
         <div class="sumbtn">
           <a class="sum-btn" href="###" target="_blank">结算</a>
@@ -66,27 +68,99 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import _ from 'lodash'
 export default {
   name: 'ShopCart',
-  computed:{
+  computed: {
     ...mapGetters('shopcart', ['cartInfoList']),
     // 商品金额总计
-    total(){
+    total() {
       let total = 0
       this.cartInfoList.forEach(cartInfo => {
-        if(cartInfo.isChecked){
+        if (cartInfo.isChecked) {
           total += cartInfo.skuNum * cartInfo.skuPrice
         }
       });
       return total
     },
     // 全选复选框状态
-    allCheck(){
-      return this.cartInfoList.every(cartInfo => cartInfo.isChecked)
+    allCheck() {
+      return this.cartInfoList.every(cartInfo => cartInfo.isChecked) && this.cartInfoList.length > 0
     }
   },
-  methods:{
-    ...mapActions('shopcart', ['getShopCart'])
+  methods: {
+    ...mapActions('shopcart', ['getShopCart', 'deleteShoppingGood', 'changeChecked', 'changeAllChecked', 'deleteChecked']),
+    ...mapActions('detail', ['addUpdateShoppingCar']),
+    // 判断商品数量输入框的合法性
+    inputHandler(event, cartInfo) {
+      let newValue = event.target.value
+      if (isNaN(newValue) || newValue < 1) {
+        event.target.value = cartInfo.skuNum
+      }
+      if (newValue > 1) {
+        event.target.value = parseInt(newValue)
+      }
+    },
+    // 购物车修改商品数量
+    // 节流
+    numHandler: _.throttle(async function (cartInfo, change) {
+      if (cartInfo.skuNum + change < 1) {
+        return
+      }
+      try {
+        // 更新商品的购买数量(通知服务器更新)
+        await this.addUpdateShoppingCar({ skuId: cartInfo.skuId, skuNum: change })
+        // 更新商品数据后，再次获取购物车数据
+        this.getShopCart()
+      } catch (error) {
+        alert('商品修改失败')
+      }
+    }, 1000),
+    // 删除购物车数据
+    async deleteGoodHandler(cartInfo) {
+      try {
+        // 通知服务器删除
+        await this.deleteShoppingGood(cartInfo.skuId)
+        // 删除后重新获取购物车数据
+        this.getShopCart()
+      } catch (error) {
+        alert('删除商品失败')
+      }
+    },
+    // 修改单个商品复选框
+    async checkboxHandler(event, cartInfo) {
+      try {
+        await this.changeChecked({ skuID: cartInfo.skuId, isChecked: Number(event.target.checked) })
+        // 重新获取数据库数据
+        this.getShopCart()
+      } catch (error) {
+        console.log(error.message);
+        alert('切换选中状态失败')
+      }
+    },
+    // 全选/全不选复选框
+    async allCheckboxHandler(event) {
+      try {
+        // 调用actions中的异步方法，改变服务器数据
+        await this.changeAllChecked(Number(event.target.checked))
+        // 重新更新购物车数据
+        this.getShopCart()
+      } catch (error) {
+        console.log(error.message);
+        alert('更新选项失败')
+      }
+    },
+    // 删除所有选中的商品
+    async deleteCheckedHandler() {
+      try {
+        // 调用actions中的方法，统一处理异步任务
+        await this.deleteChecked()
+        // 重新更新购物车数据
+        this.getShopCart()
+      } catch (error) {
+        alert('删除所选商品失败')
+      }
+    }
   },
   mounted() {
     this.getShopCart()
