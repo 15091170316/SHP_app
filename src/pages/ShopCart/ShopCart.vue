@@ -52,7 +52,7 @@
       </div>
       <div class="money-box">
         <div class="chosed">已选择
-          <span>0</span>件商品
+          <span>{{allChecked}}</span>件商品
         </div>
         <div class="sumprice">
           <em>总价（不含运费） ：</em>
@@ -86,6 +86,16 @@ export default {
     // 全选复选框状态
     allCheck() {
       return this.cartInfoList.every(cartInfo => cartInfo.isChecked) && this.cartInfoList.length > 0
+    },
+    // 选中的商品数
+    allChecked(){
+      let num = 0
+      this.cartInfoList.forEach(cartInfo => {
+        if(cartInfo.isChecked){
+          num++
+        }
+      });
+      return num
     }
   },
   methods: {
