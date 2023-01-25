@@ -20,6 +20,10 @@ server.interceptors.request.use(config => {
     if(localStorage.getItem('nanoid_token')){
         config.headers.userTempId = localStorage.getItem('nanoid_token')
     }
+    // 如果用户已经登录，就在请求头中加上登录用户的token(token值在localStorage中)
+    if(localStorage.getItem('token')){
+        config.headers.token = localStorage.getItem('token')
+    }
     // config：配置对象，对象里面的headers请求头属性很重要
     return config
 })

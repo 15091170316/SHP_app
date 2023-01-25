@@ -5,10 +5,13 @@
             <div class="container">
                 <div class="loginList">
                     <p>尚品汇欢迎您！</p>
-                    <p>
+                    <p v-if="!userInfo.phoneNum">
                         <span>请</span>
                         <router-link to="/login">登录</router-link>
-                        <router-link to="register" class="register">免费注册</router-link>
+                        <router-link to="/register" class="register">免费注册</router-link>
+                    </p>
+                    <p v-else>
+                        <span>亲爱的 {{ userInfo.nickName || userInfo.phoneNum }}</span>
                     </p>
                 </div>
                 <div class="typeList">
@@ -44,7 +47,11 @@ export default {
     name: 'HeaderVue',
     data() {
         return {
-            keyword: ''
+            keyword: '',
+            userInfo: {
+                nickName: '',
+                phoneNum: ''
+            }
         }
     },
     methods: {
@@ -56,20 +63,30 @@ export default {
             //      若有，则需要同时携带上三级菜单的参数一起跳转；若无，则直接跳转
             if (this.$route.query.categoryName) {     // 有三级菜单的路由参数
                 for (const key in this.$route.query) {
-                    if(key !== 'keyword'){  //防止把上次搜索的keyword参数添加进来
+                    if (key !== 'keyword') {  //防止把上次搜索的keyword参数添加进来
                         location.query[key] = this.$route.query[key]
                     }
                 }
             }
             // 路由跳转
             this.$router.push(location)
+
         }
     },
-    mounted(){
+    async mounted() {
         // 全局事件总线，将input搜索框置空
-        this.$bus.$on('emptySearch', ()=>{
+        this.$bus.$on('emptySearch', () => {
             this.keyword = ''
         })
+        // 用户token验证
+        try {
+            const data = await this.$store.dispatch('user/getUserInfo')
+            this.userInfo.nickName = data.nickName
+            this.userInfo.phoneNum = data.phoneNum
+        } catch (error) {
+            console.log(error.message);
+        }
+
     }
 }
 </script>

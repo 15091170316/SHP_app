@@ -8,32 +8,32 @@
             </h3>
             <div class="content">
                 <label>手机号:</label>
-                <input type="text" placeholder="请输入你的手机号">
+                <input type="text" placeholder="请输入你的手机号" v-model="userInfo.phone">
                 <span class="error-msg">错误提示信息</span>
             </div>
             <div class="content">
                 <label>验证码:</label>
-                <input type="text" placeholder="请输入验证码">
-                <img ref="code" src="http://182.92.128.115/api/user/passport/code" alt="code">
+                <input type="text" placeholder="请输入验证码" v-model="userInfo.code">
+                <button style="width:100px;height: 38px;" @click="getCodeHandler">获取验证码</button>
                 <span class="error-msg">错误提示信息</span>
             </div>
             <div class="content">
                 <label>登录密码:</label>
-                <input type="text" placeholder="请输入你的登录密码">
+                <input type="text" placeholder="请输入你的登录密码" v-model="userInfo.password">
                 <span class="error-msg">错误提示信息</span>
             </div>
             <div class="content">
                 <label>确认密码:</label>
-                <input type="text" placeholder="请输入确认密码">
+                <input type="text" placeholder="请输入确认密码" v-model="userInfo.passwordRepeat">
                 <span class="error-msg">错误提示信息</span>
             </div>
             <div class="controls">
-                <input name="m1" type="checkbox">
+                <input name="m1" type="checkbox" v-model="userInfo.agree">
                 <span>同意协议并注册《尚品汇用户协议》</span>
                 <span class="error-msg">错误提示信息</span>
             </div>
             <div class="btn">
-                <button>完成注册</button>
+                <button @click="registerHandler">完成注册</button>
             </div>
         </div>
 
@@ -57,8 +57,54 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
-    name: 'RegisterVue'
+    name: 'RegisterVue',
+    data() {
+        return {
+            userInfo: {
+                phone: '',
+                code: '',
+                password: '',
+                passwordRepeat: '',
+                agree: false
+            }
+        }
+    },
+    methods: {
+        ...mapActions('user', ['getRegisterCode', 'registerUser']),
+        // 获取验证码事件
+        async getCodeHandler() {
+            try {
+                if (this.userInfo.phone) {
+                    let code = await this.getRegisterCode(this.userInfo.phone)
+                    this.userInfo.code = code
+                } else {
+                    alert('请输入你的手机号')
+                }
+            } catch (error) {
+                console.log(error.message);
+                alert('获取验证码失败')
+            }
+        },
+        // 确认注册事件
+        async registerHandler() {
+            try {
+                if (this.userInfo.phone && this.userInfo.password === this.userInfo.passwordRepeat && this.userInfo.agree) {
+                    let params = {
+                        phone: this.userInfo.phone,
+                        password: this.userInfo.password,
+                        code: this.userInfo.code
+                    }
+                    await this.registerUser(params)
+                    this.$router.push('/login')
+                }
+
+            } catch (error) {
+                alert('账号注册失败')
+            }
+        }
+    }
 }
 </script>
 
