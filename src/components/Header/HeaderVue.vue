@@ -11,12 +11,13 @@
                         <router-link to="/register" class="register">免费注册</router-link>
                     </p>
                     <p v-else>
-                        <span>亲爱的 {{ userInfo.nickName || userInfo.phoneNum }}</span>
+                        <span>亲爱的 {{ userInfo.nickName || userInfo.phoneNum }} | </span>
+                        <a @click="exitHandler">退出登录</a>
                     </p>
                 </div>
                 <div class="typeList">
-                    <a href="###">我的订单</a>
-                    <a href="###">我的购物车</a>
+                    <router-link to="/center">我的订单</router-link>
+                    <router-link to="/shopcart">我的购物车</router-link>
                     <a href="###">我的尚品汇</a>
                     <a href="###">尚品汇会员</a>
                     <a href="###">企业采购</a>
@@ -43,15 +44,18 @@
     </header>
 </template>
 <script>
+import {removeToken} from '@/utils/token'
 export default {
     name: 'HeaderVue',
     data() {
         return {
             keyword: '',
-            userInfo: {
-                nickName: '',
-                phoneNum: ''
-            }
+        }
+    },
+    computed: {
+        // 获取登录用户的信息 
+        userInfo() {
+            return this.$store.state.user.userInfo
         }
     },
     methods: {
@@ -70,7 +74,16 @@ export default {
             }
             // 路由跳转
             this.$router.push(location)
-
+        },
+        // 退出登录
+        async exitHandler(){
+            try {
+                await this.$store.dispatch('user/exitLogin')  //通知服务器退出登录
+                removeToken()   //清除用户token信息
+                this.$router.push('/login') //跳转到登录页
+            } catch (error) {
+                console.log(error.message);
+            }
         }
     },
     async mounted() {
@@ -78,15 +91,6 @@ export default {
         this.$bus.$on('emptySearch', () => {
             this.keyword = ''
         })
-        // 用户token验证
-        try {
-            const data = await this.$store.dispatch('user/getUserInfo')
-            this.userInfo.nickName = data.nickName
-            this.userInfo.phoneNum = data.phoneNum
-        } catch (error) {
-            console.log(error.message);
-        }
-
     }
 }
 </script>

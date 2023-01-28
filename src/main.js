@@ -10,6 +10,17 @@ import store from '@/store/index'
 import '@/mock/mockServer'
 // 全局引入swiper轮播图库的CSS文件
 import 'swiper/css/swiper.min.css'
+// 按需引入部分element-ui组件
+import { Button,MessageBox, Form, Input,FormItem } from 'element-ui'
+Vue.component(Button.name, Button)
+Vue.component(MessageBox.name, MessageBox)
+Vue.component(Form.name, Form)
+Vue.component(FormItem.name, FormItem)
+Vue.component(Input.name, Input)
+Vue.prototype.$msgbox = MessageBox;
+Vue.prototype.$alert = MessageBox.alert;
+Vue.prototype.$confirm = MessageBox.confirm;
+
 // 使用路由插件
 Vue.use(VueRouter)
 

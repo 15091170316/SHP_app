@@ -6,35 +6,29 @@
                 <span class="go">我有账号，去 <a href="login.html" target="_blank">登陆</a>
                 </span>
             </h3>
-            <div class="content">
-                <label>手机号:</label>
-                <input type="text" placeholder="请输入你的手机号" v-model="userInfo.phone">
-                <span class="error-msg">错误提示信息</span>
-            </div>
-            <div class="content">
-                <label>验证码:</label>
-                <input type="text" placeholder="请输入验证码" v-model="userInfo.code">
-                <button style="width:100px;height: 38px;" @click="getCodeHandler">获取验证码</button>
-                <span class="error-msg">错误提示信息</span>
-            </div>
-            <div class="content">
-                <label>登录密码:</label>
-                <input type="text" placeholder="请输入你的登录密码" v-model="userInfo.password">
-                <span class="error-msg">错误提示信息</span>
-            </div>
-            <div class="content">
-                <label>确认密码:</label>
-                <input type="text" placeholder="请输入确认密码" v-model="userInfo.passwordRepeat">
-                <span class="error-msg">错误提示信息</span>
-            </div>
-            <div class="controls">
-                <input name="m1" type="checkbox" v-model="userInfo.agree">
-                <span>同意协议并注册《尚品汇用户协议》</span>
-                <span class="error-msg">错误提示信息</span>
-            </div>
-            <div class="btn">
-                <button @click="registerHandler">完成注册</button>
-            </div>
+
+            <el-form :model="userInfo" :rules="rules" ref="userInfo" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="手机号：" prop="phone">
+                    <el-input v-model="userInfo.phone" placeholder="请输入你的手机号"></el-input>
+                </el-form-item>
+                <el-form-item label="验证码：" prop="code">
+                    <el-input v-model="userInfo.code" placeholder="请输入验证码" style="width:200px"></el-input>
+                    <button style="width:100px;height: 38px;" @click="getCodeHandler">获取验证码</button>
+                </el-form-item>
+                <el-form-item label="登录密码：" prop="password">
+                    <el-input v-model="userInfo.password" placeholder="请输入你的登录密码"></el-input>
+                </el-form-item>
+                <el-form-item label="确认密码：" prop="passwordRepeat">
+                    <el-input v-model="userInfo.passwordRepeat" placeholder="请输入确认密码"></el-input>
+                </el-form-item>
+                <div class="controls">
+                    <input name="m1" type="checkbox" v-model="userInfo.agree">
+                    <span>同意协议并注册《尚品汇用户协议》</span>
+                </div>
+                <el-form-item>
+                    <el-button type="danger" @click="submitForm('userInfo')" style="width:200px;margin-top: 10px;">立即注册</el-button>
+                </el-form-item>
+            </el-form>
         </div>
 
         <!-- 底部 -->
@@ -68,6 +62,24 @@ export default {
                 password: '',
                 passwordRepeat: '',
                 agree: false
+            },
+            // 表单验证
+            rules: {
+                phone: [
+                    { required: true, message: '请输入手机号', trigger: 'blur' },
+                    { min: 11, max: 11, message: '手机号格式不正确', trigger: 'blur' }
+                ],
+                code: [
+                    { required: true, message: '请输入验证码', trigger: 'blur' },
+                ],
+                password: [
+                    { required: true, message: '请输入密码', trigger: 'blur' },
+                    { min: 6, max: 18, message: '密码格式为6-18位', trigger: 'blur' }
+                ],
+                passwordRepeat: [
+                    { required: true, message: '请再次输入密码', trigger: 'blur' },
+                    { min: 6, max: 18, message: '密码格式为6-18位', trigger: 'blur' }
+                ],
             }
         }
     },
@@ -87,6 +99,19 @@ export default {
                 alert('获取验证码失败')
             }
         },
+
+        // 表单验证是否成功事件
+        submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.registerHandler()  //注册并跳转
+                } else {
+                    console.log('表单验证不通过');
+                    return false;
+                }
+            });
+        },
+
         // 确认注册事件
         async registerHandler() {
             try {
@@ -109,6 +134,22 @@ export default {
 </script>
 
 <style lang="less" scoped>
+// el-input框修改样式
+.register-container .register div[data-v-8b12950a]:nth-of-type(1) {
+    margin-top: 0;
+}
+
+.el-form {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .el-form-item {
+        width: 400px
+    }
+}
+
 .register-container {
     .register {
         width: 1200px;
@@ -139,39 +180,39 @@ export default {
             margin-top: 40px;
         }
 
-        .content {
-            padding-left: 390px;
-            margin-bottom: 18px;
-            position: relative;
+        // .content {
+        //     padding-left: 390px;
+        //     margin-bottom: 18px;
+        //     position: relative;
 
-            label {
-                font-size: 14px;
-                width: 96px;
-                text-align: right;
-                display: inline-block;
-            }
+        //     label {
+        //         font-size: 14px;
+        //         width: 96px;
+        //         text-align: right;
+        //         display: inline-block;
+        //     }
 
-            input {
-                width: 270px;
-                height: 38px;
-                padding-left: 8px;
-                box-sizing: border-box;
-                margin-left: 5px;
-                outline: none;
-                border: 1px solid #999;
-            }
+        //     input {
+        //         width: 270px;
+        //         height: 38px;
+        //         padding-left: 8px;
+        //         box-sizing: border-box;
+        //         margin-left: 5px;
+        //         outline: none;
+        //         border: 1px solid #999;
+        //     }
 
-            img {
-                vertical-align: sub;
-            }
+        //     img {
+        //         vertical-align: sub;
+        //     }
 
-            .error-msg {
-                position: absolute;
-                top: 100%;
-                left: 495px;
-                color: red;
-            }
-        }
+        //     .error-msg {
+        //         position: absolute;
+        //         top: 100%;
+        //         left: 495px;
+        //         color: red;
+        //     }
+        // }
 
         .controls {
             text-align: center;

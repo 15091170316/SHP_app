@@ -1,5 +1,11 @@
-import {reqRegisterCode, reqRegister, reqLogin, reqUserInfo} from '@/api/api'
-const state = {}
+import {reqRegisterCode, reqRegister, reqLogin, reqUserInfo, reqExitLogin} from '@/api/api'
+import {setToken} from '@/utils/token'
+const state = {
+    userInfo: {}
+}
+const getters = {
+   
+}
 const actions= {
     // 获取注册验证码
     async getRegisterCode(_, phone){
@@ -24,24 +30,38 @@ const actions= {
         let result = await reqLogin(params)
         if(result.code === 200){
             // 存储token到localStorage
-            localStorage.setItem('token', result.data.token)
+            setToken(result.data.token)
             return 'ok'
         }else{
             return Promise.reject(new Error('账号或密码错误'))
         }
     },
     // 根据token，获取用户信息
-    async getUserInfo(){
+    async getUserInfo(context){
         let result = await reqUserInfo()
         if(result.code === 200){
-            return result.data
+            context.commit('GETUSERINFO', result.data)
         }else{
+            context.commit('GETUSERINFO', {})
             return Promise.reject(new Error('用户验证失败'))
+        }
+    },
+    // 退出登录异步请求
+    async exitLogin(context){
+        let result = await reqExitLogin()
+        if(result.code === 200){
+            context.commit('GETUSERINFO', {})
+            return 'ok'
+        }else{
+            return Promise.reject(new Error('退出登录失败'))
         }
     }
 }
-const mutations = {}
-const getters = {}
+const mutations = {
+    GETUSERINFO(state, value){
+        state.userInfo = value
+    }
+}
 
 export default{
     namespaced: true,

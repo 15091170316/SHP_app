@@ -3,6 +3,8 @@ import axios from 'axios'
 // 引入nprogress进度条和样式
 import nprogress from 'nprogress'
 import "nprogress/nprogress.css"
+// 封装的token获取方法
+import {getToken} from '@/utils/token'
 
 // 1、利用axios对象的create方法，去创建一个axios实例
 // 2、server就是axios，只不过稍微配置一下
@@ -21,8 +23,8 @@ server.interceptors.request.use(config => {
         config.headers.userTempId = localStorage.getItem('nanoid_token')
     }
     // 如果用户已经登录，就在请求头中加上登录用户的token(token值在localStorage中)
-    if(localStorage.getItem('token')){
-        config.headers.token = localStorage.getItem('token')
+    if(getToken()){
+        config.headers.token = getToken()
     }
     // config：配置对象，对象里面的headers请求头属性很重要
     return config

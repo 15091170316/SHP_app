@@ -81,7 +81,8 @@ export default {
         async loginHandler(){
             try {
                 await this.LoginUser({phone: this.phone, password: this.password})
-                this.$router.push('/home')
+                let toPath = this.$route.query.topath   //获取路由守卫拦截的路由，若有目标路由，就跳转到目标路由
+                this.$router.push(toPath ? toPath : '/home')
             } catch (error) {
                 alert(error.message)
             }

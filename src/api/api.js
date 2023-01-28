@@ -69,7 +69,10 @@ const reqRegister = ({
     }
 })
 // 用户登录账号接口
-const reqLogin = ({phone, password}) => server({
+const reqLogin = ({
+    phone,
+    password
+}) => server({
     method: 'post',
     url: '/user/passport/login',
     data: {
@@ -78,9 +81,38 @@ const reqLogin = ({phone, password}) => server({
     }
 })
 // 根据token获取用户信息接口
-const reqUserInfo = () => server({method: 'get', url: '/user/passport/auth/getUserInfo'})
-
-
+const reqUserInfo = () => server({
+    method: 'get',
+    url: '/user/passport/auth/getUserInfo'
+})
+// 退出登录接口
+const reqExitLogin = () => server({
+    method: 'get',
+    url: '/user/passport/logout'
+})
+// 获取用户地址接口
+const reqUserAddress = () => server({
+    method: 'get',
+    url: '/user/userAddress/auth/findUserAddressList'
+})
+// 获取用户订单数据接口
+const reqUserTrade = () => server({
+    method: 'get',
+    url: '/order/auth/trade'
+})
+// 提交订单接口
+const reqCommitTrade = (tradeNo, data) => server({
+    method: 'post',
+    url: `/order/auth/submitOrder?tradeNo=${tradeNo}`,
+    data
+})
+// 获取订单支付信息接口
+const reqTradePay = (orderId) => server({method: 'get', url: `/payment/weixin/createNative/${orderId}`
+})
+// 查询支付订单状态接口
+const reqPayStatus = (orderId) => server({method: 'get', url:`/payment/weixin/queryPayStatus/${orderId}`})
+// 获取我的订单列表接口
+const reqMyOrderList = ({page, limit}) => server({method: 'get', url: `/order/auth/${page}/${limit}`})
 
 // 统一向外暴露请求
 export {
@@ -96,5 +128,12 @@ export {
     reqRegisterCode,
     reqRegister,
     reqLogin,
-    reqUserInfo
+    reqUserInfo,
+    reqExitLogin,
+    reqUserAddress,
+    reqUserTrade,
+    reqCommitTrade,
+    reqTradePay,
+    reqPayStatus,
+    reqMyOrderList
 }
